@@ -15,7 +15,7 @@ export function Header() {
           <Link href={'/login'} className={buttonVariants({ variant: 'secondary' })}>
             Sign in
           </Link>
-          <Link href={'/login'} className={buttonVariants({ variant: 'default' })}>
+          <Link href={'#'} className={buttonVariants({ variant: 'default' })}>
             Try name for free <ArrowRight />
           </Link>
         </div>
