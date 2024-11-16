@@ -1,12 +1,26 @@
 import axios from 'axios';
 
-export const getCSRFToken = async () => {
-  try {
-    await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sanctum/csrf-cookie`, {
-      withCredentials: true,
-    });
-  } catch (error) {
-    console.error('Failed to get CSRF token:', error);
-    throw new Error('CSRF token fetch failed');
-  }
+type LoginParams = {
+  email: string;
+  password: string;
 };
+
+export async function handleLogin({ email, password }: LoginParams) {
+  await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sanctum/csrf-cookie`, {
+    withCredentials: true,
+  });
+
+  const response = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/login`,
+    { email, password },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+      withXSRFToken: true,
+    }
+  );
+
+  return response.status;
+}

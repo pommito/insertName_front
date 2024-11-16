@@ -2,35 +2,26 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import axios from 'axios';
 
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
+import { handleLogin } from '../hooks/auth';
+import { useRouter } from 'next/navigation';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const response = await handleLogin({ email, password });
 
-    await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sanctum/csrf-cookie`, {
-      withCredentials: true,
-    });
-
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/login`,
-      { email, password },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-        withXSRFToken: true,
-      }
-    );
+    if (response === 200 || response === 302) {
+      router.push('/dashboard');
+    }
   };
 
   return (
