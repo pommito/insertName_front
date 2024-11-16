@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import axios from 'axios';
 
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
+import { getCSRFToken } from '../hooks/auth';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -17,17 +19,25 @@ export function LoginForm() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    await getCSRFToken();
 
-    if (response.ok) {
-      const data = await response.json();
-      localStorage.setItem('token', data.token);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`,
+      { email, password },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      }
+    );
+
+    if (response.status === 200) {
+      const user = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user`, {
+        withCredentials: true,
+      });
+      console.log(user.data);
+
       router.push('/dashboard');
     } else {
       console.log('Login failed');
