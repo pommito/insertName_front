@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import axios from 'axios';
 
@@ -9,39 +8,29 @@ import { Button } from '@/src/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
-import { getCSRFToken } from '../hooks/auth';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    await getCSRFToken();
+    await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sanctum/csrf-cookie`, {
+      withCredentials: true,
+    });
 
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`,
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/login`,
       { email, password },
       {
         headers: {
           'Content-Type': 'application/json',
         },
         withCredentials: true,
+        withXSRFToken: true,
       }
     );
-
-    if (response.status === 200) {
-      const user = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user`, {
-        withCredentials: true,
-      });
-      console.log(user.data);
-
-      router.push('/dashboard');
-    } else {
-      console.log('Login failed');
-    }
   };
 
   return (
