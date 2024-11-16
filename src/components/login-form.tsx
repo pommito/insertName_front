@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { handleLogin } from '../hooks/auth';
 
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
-import { handleLogin } from '../hooks/auth';
-import { useRouter } from 'next/navigation';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -19,7 +19,9 @@ export function LoginForm() {
     event.preventDefault();
     const response = await handleLogin({ email, password });
 
-    if (response === 200 || response === 302) {
+    if (response === 204 || response === 302) {
+      console.log('Login successful');
+
       router.push('/dashboard');
     }
   };

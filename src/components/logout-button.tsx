@@ -1,26 +1,21 @@
 'use client';
 
-import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { handleLogout } from '../hooks/auth';
 import { buttonVariants } from './ui/button';
 
 export function LogoutButton() {
-  const handleLogout = async () => {
-    await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sanctum/csrf-cookie`, {
-      withCredentials: true,
-    });
+  const router = useRouter();
 
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`,
-      {},
-      {
-        withCredentials: true,
-        withXSRFToken: true,
-      }
-    );
+  const handleClick = async () => {
+    const response = await handleLogout();
+    if (response === 204) {
+      router.push('/login');
+    }
   };
 
   return (
-    <button onClick={handleLogout} className={buttonVariants({ variant: 'default' })}>
+    <button onClick={handleClick} className={buttonVariants({ variant: 'default' })}>
       Logout
     </button>
   );
